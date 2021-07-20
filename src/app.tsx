@@ -2,7 +2,7 @@ import React, { useCallback, useEffect ,useState} from "react";
 import { Form } from '@unform/web';
 import Input from './components/input';
 
-import { deleteItemTodo, getAllTodos, ITodo, setNewTodo } from "./domain/Todo";
+import { deleteItemTodo, getAllTodos, ITodo, setNewTodo, updateStatusItemTodo } from "./domain/Todo";
 
 export default function App() {
 
@@ -18,9 +18,11 @@ export default function App() {
 
   const deleteItem = useCallback(
     async (value:ITodo) => {
-        await deleteItemTodo(value);
+        const resp = await deleteItemTodo(value);
+        if(!resp) return;
 
-        var filtered = todos.filter(function(item){ 
+
+        let filtered = todos.filter(function(item){ 
           return item !== value
         });
 
@@ -29,12 +31,28 @@ export default function App() {
     [todos],
   );
 
-  // const resolveTodo = useCallback(
-  //   () => {
-      
-  //   },
-  //   [todos],
-  // )
+  const updateStatus = useCallback(
+    async (value:ITodo) => {
+        const resp = await updateStatusItemTodo(value);
+        if(!resp) return;
+
+        let newArray = [...todos];
+
+        const running = newArray.map((element:ITodo,i)=>{
+          if(element === value){
+            element.isDone = !value.isDone ;
+            return element;
+          }else{
+            return element;
+          }          
+        })
+
+        await Promise.all(running) ;
+
+        setTodos(newArray);
+    },
+    [todos],
+  )
 
   const submitForm = useCallback(
     async (data:{title:string},{ reset }) => {
@@ -61,7 +79,7 @@ export default function App() {
         <ul>
         {todos.length > 0 &&         
           todos.map((element:ITodo)=>(
-            <li key={element.id}>{element.title} <p onClick={()=>{deleteItem(element)}}>delete</p> </li>
+            <li key={element.id}>{element.title} - {String(element.isDone)} <p onClick={()=>{deleteItem(element)}}>delete</p> <p onClick={()=>{updateStatus(element)}}>alterar</p> </li>
           ))         
         }
         </ul>
