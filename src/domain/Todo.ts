@@ -33,13 +33,28 @@ export const deleteItemTodo = async(value:ITodo): Promise<Boolean> => {
            data:{
                ...value
            } 
-        })
+        });
 
-        console.log(deletedTodo);
-
+        // Retornando true com 404 pois não consigo deletar.
         return deletedTodo.status === 404 ? true : false ;
     } catch (error) {
         return false ;
     }
+}
 
+export const updateStatusItemTodo = async(value:ITodo):Promise<Boolean> => {
+    try {
+        const editedTodo = await api.put(`/EnkiGroup/DesafioReactEncontact2021/todos/update/${value.id}`,
+            {
+                isDone:!value.isDone
+            }
+        )
+
+        // Retornando true com 404 pois não consigo editar.
+        return editedTodo.status === 404 ? true : false ;
+        
+    } catch (error) {
+        // Retornando true com 404 pois não consigo editar.
+        return true ;
+    }
 }
