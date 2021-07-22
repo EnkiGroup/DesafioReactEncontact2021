@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { Form as Unform } from "@unform/web";
-import { FcEmptyTrash as IconType } from "react-icons/fc";
 
 export const SCContainer = styled.section`
   margin: 0 auto;
@@ -39,7 +38,6 @@ export const SCForm = styled(Unform)`
 `;
 
 export const SCHeaderTodo = styled.div`
-  /* display: flex; */
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -69,9 +67,28 @@ export const SCItemTODO = styled.div`
   border-bottom: 2px solid #f5f5f5;
   font-size: 24px;
   color: #8d8989;
-  cursor: pointer;
+  * {
+    cursor: pointer;
+  }
+
+  label {
+    flex: 1;
+  }
 
   input {
     flex-basis: 64px;
+  }
+`;
+
+export const SCListEmpty = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+  justify-content: center;
+  align-items: center;
+
+  h5 {
+    font-size: 18px;
+    color: #ccc;
   }
 `;
