@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Form } from "@unform/web";
 import Input from "./components/input";
+
+import { IoChevronDown } from "react-icons/io5";
 
 import {
   deleteItemTodo,
@@ -11,11 +12,22 @@ import {
   updateStatusItemTodo,
 } from "./domain/Todo";
 
-import CheckBox from "./components/CheckBox";
-import { SCContainer, SCHeaderTodo, SCTitle } from "./styles/appStyle";
+import { SCContainer, SCForm, SCHeaderTodo, SCTitle } from "./styles/appStyle";
+import ItemTodo from "./components/patternItemTodo";
 
-export default function App() {
-  const [todos, setTodos] = useState<ITodo[]>([]);
+export enum ACTION_EDIT_MODE {
+  Remove = "REMOVE",
+  Select = "SELECT_ONE",
+  DoneALL = "DONE_ALL",
+}
+
+interface ITodoItem extends ITodo {
+  editMode?: boolean;
+}
+
+const App = () => {
+  const [todos, setTodos] = useState<ITodoItem[]>([]);
+  const [selectALL, setSelectALL] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
@@ -62,8 +74,41 @@ export default function App() {
     [todos]
   );
 
+  const controlEditMode = useCallback(
+    async (action: ACTION_EDIT_MODE, value?: ITodoItem) => {
+      let newArray = [...todos];
+
+      const running = newArray.map(async (element: ITodoItem, i) => {
+        if (action === "REMOVE") {
+          element.editMode = false;
+          return element;
+        }
+
+        if (action === "DONE_ALL") {
+          element.isDone = selectALL;
+          await updateStatus(element);
+          return element;
+        }
+
+        if (value && action === "SELECT_ONE") {
+          if (element.id === value.id) {
+            element.editMode = true;
+          } else {
+            element.editMode = false;
+          }
+        }
+
+        return element;
+      });
+      await Promise.all(running);
+      setTodos(newArray);
+    },
+    [todos]
+  );
+
   const submitEdit = useCallback(
-    async (data: { id: string; title: string }, { reset }) => {
+    async (data: { id: string; title: string }) => {
+      console.log("Alterando info");
       console.log(data);
       const resp = await setUpdateTodo(data);
       if (!resp) return;
@@ -82,6 +127,8 @@ export default function App() {
 
       console.log(newArray);
       setTodos(newArray);
+
+      console.log("Alteração efetuada");
     },
     [todos]
   );
@@ -100,62 +147,50 @@ export default function App() {
 
   return (
     <SCContainer>
-      <SCTitle>Todos</SCTitle>
+      <SCTitle>ToDo List</SCTitle>
 
       <SCHeaderTodo>
-        <Form onSubmit={submitInsert}>
-          <Input name="title" type="text" />
-        </Form>
+        <IoChevronDown
+          size={36}
+          color={"#ccc"}
+          style={{ paddingTop: "10px", flexBasis: "48px" }}
+          onClick={() => {
+            setSelectALL((prevState) => !prevState);
+            controlEditMode(ACTION_EDIT_MODE.DoneALL);
+          }}
+        />
+
+        <SCForm onSubmit={submitInsert}>
+          <Input
+            name="title"
+            type="text"
+            placeholder="Nova tarefa? Digite aqui"
+          />
+        </SCForm>
       </SCHeaderTodo>
 
       {todos.length === 0 && <h5>Listagem vazia</h5>}
 
       <ul>
-        {todos.map((element: ITodo) => (
-          <li key={element.id}>
-            <input
-              key={element.id}
-              onClick={() => {
-                updateStatus(element);
-              }}
-              type="checkbox"
-              checked={element.isDone}
-              value={element.title}
+        {todos.map((element: ITodoItem) => (
+          <li
+            key={element.id}
+            onDoubleClick={() => {
+              controlEditMode(ACTION_EDIT_MODE.Select, element);
+            }}
+          >
+            <ItemTodo
+              value={element}
+              editMode={element.editMode ? element.editMode : false}
+              onUpdateStatus={updateStatus}
+              onUpdateTitle={submitEdit}
+              onControllerEditMode={controlEditMode}
             />
-            {element.title}
-
-            {/* <div style={{ display: "flex", flexDirection: "row" }}>
-                {element.title} - {String(element.isDone)}
-                <p
-                  onClick={() => {
-                    deleteItem(element);
-                  }}
-                >
-                  delete
-                </p>
-                <p
-                  onClick={() => {
-                    updateStatus(element);
-                  }}
-                >
-                  alterar
-                </p>
-              </div> */}
-            {/* <Form onSubmit={submitEdit}>
-                <Input
-                  name="id"
-                  type="text"
-                  defaultValue={element.id}
-                  style={{ display: "none" }}
-                />
-                <Input name="title" type="text" />
-                <button style={{ display: "none" }} type="submit">
-                  enviar
-                </button>
-              </Form> */}
           </li>
         ))}
       </ul>
     </SCContainer>
   );
-}
+};
+
+export default App;
