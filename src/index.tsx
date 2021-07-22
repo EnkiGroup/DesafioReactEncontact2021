@@ -1,13 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./app";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
+import App, { FILTER } from "./app";
 import GlobalStyle from "./styles/global";
 import reportWebVitals from "./reportWebVitals";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 ReactDOM.render(
   <React.StrictMode>
     <GlobalStyle />
-    <App />
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <App filter={FILTER.ALL} />
+        </Route>
+        <Route path="/active">
+          <App filter={FILTER.ACTIVE} />
+        </Route>
+        <Route path="/completed">
+          <App filter={FILTER.COMPLETED} />
+        </Route>
+      </Switch>
+    </Router>
+    <ToastContainer />
   </React.StrictMode>,
   document.getElementById("root")
 );

@@ -5,6 +5,8 @@ import { IoChevronDown } from "react-icons/io5";
 
 import {
   deleteItemTodo,
+  getAllActive,
+  getAllComplete,
   getAllTodos,
   ITodo,
   setNewTodo,
@@ -12,7 +14,15 @@ import {
   updateStatusItemTodo,
 } from "./domain/Todo";
 
-import { SCContainer, SCForm, SCHeaderTodo, SCTitle } from "./styles/appStyle";
+import { toast } from "react-toastify";
+
+import {
+  SCContainer,
+  SCForm,
+  SCHeaderTodo,
+  SCListEmpty,
+  SCTitle,
+} from "./styles/appStyle";
 import ItemTodo from "./components/patternItemTodo";
 
 export enum ACTION_EDIT_MODE {
@@ -21,21 +31,64 @@ export enum ACTION_EDIT_MODE {
   DoneALL = "DONE_ALL",
 }
 
+export enum TOAST_STATUS {
+  SUCESS = "SUCESS",
+  DELETE = "DELETE",
+}
+
 interface ITodoItem extends ITodo {
   editMode?: boolean;
 }
 
-const App = () => {
+export enum FILTER {
+  ALL = "ALL",
+  ACTIVE = "ACTIVE",
+  COMPLETED = "COMPLETED",
+}
+
+interface PropsAPP {
+  filter: FILTER;
+}
+
+const App: React.FC<PropsAPP> = (props) => {
   const [todos, setTodos] = useState<ITodoItem[]>([]);
   const [selectALL, setSelectALL] = useState<boolean>(true);
 
+  const notify = (status: TOAST_STATUS, msg: string) =>
+    toast(msg, {
+      autoClose: 1000,
+      hideProgressBar: true,
+      style: {
+        backgroundColor: status === "SUCESS" ? "#4ab453" : "#c21616",
+        color: "#fff",
+      },
+    });
+
   useEffect(() => {
     (async () => {
-      const todos = await getAllTodos();
-      if (todos.length === 0) return;
-      setTodos(todos);
+      let todos = [];
+
+      switch (props.filter) {
+        case FILTER.ALL:
+          todos = await getAllTodos();
+          setTodos(todos);
+          break;
+        case FILTER.ACTIVE:
+          todos = await getAllActive();
+          setTodos(todos);
+          break;
+        case FILTER.COMPLETED:
+          todos = await getAllComplete();
+          setTodos(todos);
+          break;
+
+        default:
+          todos = await getAllTodos();
+          setTodos(todos);
+          break;
+      }
     })();
-  }, []);
+  }, [props.filter]);
 
   const deleteItem = useCallback(
     async (value: ITodo) => {
@@ -47,6 +100,7 @@ const App = () => {
       });
 
       setTodos(filtered);
+      notify(TOAST_STATUS.DELETE, "Tarefa removida com sucesso");
     },
     [todos]
   );
@@ -70,6 +124,12 @@ const App = () => {
       await Promise.all(running);
 
       setTodos(newArray);
+      notify(
+        TOAST_STATUS.SUCESS,
+        value.isDone === true
+          ? "Tarefa realizada com sucesso"
+          : "Tente fazer novamente"
+      );
     },
     [todos]
   );
@@ -103,7 +163,7 @@ const App = () => {
       await Promise.all(running);
       setTodos(newArray);
     },
-    [todos]
+    [selectALL, todos, updateStatus]
   );
 
   const submitEdit = useCallback(
@@ -128,7 +188,7 @@ const App = () => {
       console.log(newArray);
       setTodos(newArray);
 
-      console.log("Alteração efetuada");
+      notify(TOAST_STATUS.SUCESS, "Tarefa atualizada com sucesso");
     },
     [todos]
   );
@@ -141,6 +201,7 @@ const App = () => {
       }
 
       reset();
+      notify(TOAST_STATUS.SUCESS, "Tarefa cadastrada com sucesso");
     },
     []
   );
@@ -169,7 +230,16 @@ const App = () => {
         </SCForm>
       </SCHeaderTodo>
 
-      {todos.length === 0 && <h5>Listagem vazia</h5>}
+      {todos.length === 0 && (
+        <SCListEmpty>
+          <h5>Listagem vazia</h5>
+          <img
+            src={"/complete_task.svg"}
+            style={{ height: 150, width: 150 }}
+            alt="website logo"
+          />
+        </SCListEmpty>
+      )}
 
       <ul>
         {todos.map((element: ITodoItem) => (
@@ -185,6 +255,7 @@ const App = () => {
               onUpdateStatus={updateStatus}
               onUpdateTitle={submitEdit}
               onControllerEditMode={controlEditMode}
+              onDeleteItem={deleteItem}
             />
           </li>
         ))}

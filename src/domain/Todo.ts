@@ -15,6 +15,33 @@ export const getAllTodos = async (): Promise<ITodo[]> => {
   }
 };
 
+export const getAllActive = async (): Promise<ITodo[]> => {
+  try {
+    const todos = await api.get("/EnkiGroup/DesafioReactEncontact2021/todos");
+
+    // eslint-disable-next-line array-callback-return
+    let filtered: ITodo[] = todos.data.filter((element: ITodo) => {
+      if (!element.isDone) return element;
+    });
+    return filtered;
+  } catch (error) {
+    return [];
+  }
+};
+
+export const getAllComplete = async (): Promise<ITodo[]> => {
+  try {
+    const todos = await api.get("/EnkiGroup/DesafioReactEncontact2021/todos");
+    // eslint-disable-next-line array-callback-return
+    let filtered: ITodo[] = todos.data.filter((element: ITodo) => {
+      if (element.isDone) return element;
+    });
+    return filtered;
+  } catch (error) {
+    return [];
+  }
+};
+
 export const setUpdateTodo = async (
   value: Partial<ITodo>
 ): Promise<Boolean> => {
