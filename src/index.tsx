@@ -3,14 +3,13 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import App, { FILTER } from "./app";
-import GlobalStyle from "./styles/global";
+
 import reportWebVitals from "./reportWebVitals";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 ReactDOM.render(
   <React.StrictMode>
-    <GlobalStyle />
     <Router>
       <Switch>
         <Route exact path="/">
@@ -24,6 +23,7 @@ ReactDOM.render(
         </Route>
       </Switch>
     </Router>
+
     <ToastContainer />
   </React.StrictMode>,
   document.getElementById("root")

@@ -1,8 +1,8 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ACTION_EDIT_MODE } from "../app";
 
 import { ITodo } from "../domain/Todo";
-import { SCForm, SCItemTODO } from "../styles/appStyle";
+import { SCFormEdit, SCItemTODO } from "../styles/appStyle";
 import Input from "./input";
 
 import { FcEmptyTrash } from "react-icons/fc";
@@ -17,7 +17,6 @@ interface PropsItemTodo {
 }
 
 const ItemTodo: React.FC<PropsItemTodo> = (props) => {
-  const refName = useRef(null);
   const [hoverItem, setHoverItem] = useState(false);
 
   const onMouseLeave = useCallback(() => {
@@ -29,17 +28,11 @@ const ItemTodo: React.FC<PropsItemTodo> = (props) => {
     setHoverItem(true);
   }, []);
 
-  const selectAllText = (e: any) => {
-    /* @ts-ignore */
-    e.target.select();
-  };
-
   return (
     <SCItemTODO
       onMouseLeave={onMouseLeave}
       onMouseEnter={onMouseEnter}
-      onFocus={selectAllText}
-      style={{ backgroundColor: props.editMode ? "#f1edec" : "#fff" }}
+      id={props.editMode ? "editMode" : ""}
     >
       <input
         key={props.value.id}
@@ -51,42 +44,46 @@ const ItemTodo: React.FC<PropsItemTodo> = (props) => {
         checked={props.value.isDone ? props.value.isDone : false}
         value={props.value.title}
       />
-      <label
-        style={{
-          display: props.editMode ? "none" : "block",
-          textDecoration: props.value.isDone ? "line-through" : "none",
-        }}
-      >
-        {props.value.title}
-      </label>
-      {props.editMode && (
-        <SCForm
-          onSubmit={(data: { id: string; title: string }) => {
-            props.onUpdateTitle({
-              id: props.value.id,
-              title: data.title,
-            });
-            props.onControllerEditMode(ACTION_EDIT_MODE.Remove);
-          }}
-        >
-          <Input
-            name="id"
-            type="text"
-            defaultValue={props.value.id}
-            style={{ display: "none" }}
-          />
-          <Input
-            name="title"
-            type="text"
-            ref={refName}
-            defaultValue={props.value.title}
-            style={{ backgroundColor: props.editMode ? "#f1edec" : "#fff" }}
-          />
-          <button style={{ display: "none" }} type="submit">
-            enviar
-          </button>
-        </SCForm>
-      )}
+
+      <div style={{ width: "100%", flex: 1 }}>
+        {!props.editMode && (
+          <label
+            style={{
+              textDecoration: props.value.isDone ? "line-through" : "none",
+            }}
+          >
+            {props.value.title}
+          </label>
+        )}
+
+        {props.editMode && (
+          <SCFormEdit
+            onSubmit={(data: { id: string; title: string }) => {
+              props.onUpdateTitle({
+                id: props.value.id,
+                title: data.title,
+              });
+              props.onControllerEditMode(ACTION_EDIT_MODE.Remove);
+            }}
+          >
+            <Input
+              name="id"
+              type="text"
+              defaultValue={props.value.id}
+              style={{ display: "none" }}
+            />
+            <Input
+              name="title"
+              type="text"
+              defaultValue={props.value.title}
+              id={props.editMode && "edited"}
+            />
+            <button style={{ display: "none" }} type="submit">
+              enviar
+            </button>
+          </SCFormEdit>
+        )}
+      </div>
 
       {hoverItem && (
         <FcEmptyTrash
