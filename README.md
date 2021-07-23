@@ -2,6 +2,10 @@
 
 Bem-vindo ao teste para desenvolvimento front-end na enContact.
 
+## Desafio concluido
+
+<img src="data/dasafio concluido.gif" alt="Comportamento da lista de tarefas" width="750">
+
 ## O teste
 
 Para testar suas habilidades em TypeScript e folhas de estilos, nos baseamos no projeto [Todo MVC](https://todomvc.com).
