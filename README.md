@@ -2,6 +2,10 @@
 
 Bem-vindo ao teste para desenvolvimento front-end na enContact.
 
+## Desafio concluido
+
+<img src="https://github.com/HelioSilva/DesafioReactEncontact2021/blob/main/data/desafio.gif" alt="Desafio concluido" width="750">
+
 ## O teste
 
 Para testar suas habilidades em TypeScript e folhas de estilos, nos baseamos no projeto [Todo MVC](https://todomvc.com).
