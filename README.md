@@ -4,7 +4,7 @@ Bem-vindo ao teste para desenvolvimento front-end na enContact.
 
 ## Desafio concluido
 
-<img src="data/dasafio.gif" alt="Desafio concluido" width="750">
+<img src="https://github.com/HelioSilva/DesafioReactEncontact2021/blob/main/data/desafio.gif" alt="Desafio concluido" width="750">
 
 ## O teste
 
