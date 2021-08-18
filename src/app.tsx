@@ -1,9 +1,15 @@
-import React from "react";
+import { GlobalStyle } from './styles/global'
+import { TasksProvider } from "./hooks/useTasks";
+
+import { Dashboard } from './components/Dashboard'
 
 export default function App() {
+
   return (
-    <section>
-      <h1>Todos</h1>
-    </section>
+    <TasksProvider>
+      <Dashboard />
+
+      <GlobalStyle />
+    </TasksProvider>
   );
 }
